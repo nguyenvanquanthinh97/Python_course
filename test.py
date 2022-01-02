@@ -1,17 +1,5 @@
-dict_1 = {
-    "name": {
-        "vietnamese": "Thinh",
-        "english": "John"
-    },
-    "age": 24
-}
+iter_1 = iter([1,2,3,4])
+item_1 = next(iter_1)
 
-dict_2 = {
-    "name": {
-        "vietnamese": "Thinh",
-        "english": "John"
-    },
-    "age": 24
-}
-
-print("is Equal: {}".format(dict_1 == dict_2))
+for item in iter_1:
+    print(item)
