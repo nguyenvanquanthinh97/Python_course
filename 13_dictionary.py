@@ -41,3 +41,8 @@ students = {
 }
 
 print(students['Alice']['age'])
+
+## For safety when accessing key-value in dict without crashing program
+## use .get()
+
+print("Safety: {}".format(students.get("Alice").get("26")))
