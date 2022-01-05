@@ -3,6 +3,28 @@ from tkinter import messagebox
 from random import randint, choice, shuffle
 import string
 import pyperclip
+import json
+# ---------------------------- SEARCH ------------------------------- #
+def search():
+    website = website_entry.get().strip()
+    if len(website) == 0:
+        return
+    try:
+        with open("data.json") as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        pass
+    else:
+        user_info = data.get(website.title())
+        if not user_info:
+            messagebox.showinfo(title=website, message="No details for the website exists")
+            return
+        
+        email_username = user_info.get("email", "")
+        password = user_info.get("password", "")
+        messagebox.showinfo(title=website, message=f"Email/Username: {email_username}\nPassword: {password}")
+        
+
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 def generate_password():
     if len(password_input.get()) > 0:
@@ -47,18 +69,34 @@ def save_data():
     email_username = email_username_input.get().strip()
     password = password_input.get().strip()
     
+    new_data = {
+        website.title(): {
+            "email": email_username,
+            "password": password
+        }
+    }
+    
     if len(email_username) == 0 or len(password) == 0:
         messagebox.showerror(message="Opps either Email/Username or Password filed is empty")
         return
     
     is_ok = messagebox.askokcancel(title=website, message=f"These are the details entered: \nEmail: {email_username}\nPassword: {password}")
-    print("is_ok", is_ok)
     
-    if is_ok:
-        with open("data.txt", mode="a") as file:
-            content = f"{website} | {email_username} | {password}\n"
-            file.write(content)
-            clean_fields()
+    if not is_ok:
+        return
+    try:
+        with open("data.json", mode="r") as file:
+            # Reading old data
+            data = json.load(file)
+            # Updating old data with new data
+            data.update(new_data)
+    except:
+        data = new_data        
+        
+    with open("data.json", mode="w") as file:
+        # Saving update data
+        json.dump(data, file, indent=4)
+        clean_fields()
 # ---------------------------- UI SETUP ------------------------------- #
 
 window = Tk()
@@ -73,9 +111,12 @@ canvas.grid(row=0, column=1)
 webste_label = Label(text="Website:")
 webste_label.grid(row=1, column=0)
 
-website_entry = Entry(width=35)
-website_entry.grid(row=1, column=1, columnspan=2)
+website_entry = Entry(width=18)
+website_entry.grid(row=1, column=1)
 website_entry.focus()
+
+search_button = Button(text="Search", width=10, command=search)
+search_button.grid(row=1, column=2)
 
 email_username_label = Label(text="Email/Username:")
 email_username_label.grid(row=2, column=0)
